@@ -29,18 +29,19 @@ namespace AgShell.Pty.Tests
         {
             string pidFile = Path.Combine(Path.GetTempPath(), "agshell-hook-pid-" + Guid.NewGuid().ToString("N"));
             Process? descendant = null;
+            Process? parent = null;
             try
             {
-                using BackgroundCommand command = BackgroundCommand.Start(Shell("start /b \"\" powershell.exe -NoProfile -Command \"$PID | Set-Content '" + pidFile + "'; Start-Sleep -Seconds 30\""), true);
+                ProcessStartInfo start = new ProcessStartInfo(Path.Combine(AppContext.BaseDirectory, "AgShell.Pty.Tests.exe"),
+                    "input-parent \"" + pidFile + "\"")
+                {
+                    WorkingDirectory = Path.GetTempPath(),
+                };
+                using BackgroundCommand command = BackgroundCommand.Start(start, true);
+                parent = Process.GetProcessById(command.Id);
                 using CancellationTokenSource cancel = new CancellationTokenSource();
                 Task writing = command.WriteInputAsync(new byte[4 * 1024 * 1024], cancel.Token);
                 Assert.Equal(0, await command.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(10)));
-                DateTime deadline = DateTime.UtcNow.AddSeconds(5);
-                while (!File.Exists(pidFile) && DateTime.UtcNow < deadline)
-                {
-                    await Task.Delay(25);
-                }
-
                 descendant = Process.GetProcessById(int.Parse(File.ReadAllText(pidFile).Trim()));
                 Assert.False(writing.IsCompleted);
                 await cancel.CancelAsync();
@@ -48,6 +49,12 @@ namespace AgShell.Pty.Tests
             }
             finally
             {
+                if (parent is not null)
+                {
+                    if (!parent.HasExited) parent.Kill(entireProcessTree: true);
+                    parent.Dispose();
+                }
+
                 if (descendant is not null)
                 {
                     if (!descendant.HasExited) descendant.Kill();
