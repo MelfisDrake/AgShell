@@ -39,6 +39,7 @@ namespace AgShell.Pty.Tests
                     ProcessStartInfo start = new ProcessStartInfo(Path.Combine(AppContext.BaseDirectory, "AgShell.Pty.Tests.exe"))
                     {
                         UseShellExecute = false,
+                        CreateNoWindow = true,
                         RedirectStandardOutput = true,
                     };
                     start.ArgumentList.Add("hold-input");
