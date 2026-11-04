@@ -5,7 +5,7 @@ GitHub release, as agterm's scripts/release.sh does for its DMG.
 
 .EXAMPLE
 scripts/release.ps1 0.1.0             # build into dist\ only
-scripts/release.ps1 0.1.0 -Publish -Repository OWNER/REPOSITORY    # also tag v0.1.0 on the pushed main and create the GitHub release
+scripts/release.ps1 0.1.0 -Publish -Repository MelfisDrake/AgShell    # also tag v0.1.0 on the pushed main and create the GitHub release
 scripts/release.ps1 0.1.0 -NoAot      # agshellctl and the live daemon without Native AOT, for machines without the C++ build tools
 
 The live daemon's agshell-vt.dll is built first by scripts/build-agshell-vt.ps1, which needs Zig 0.16 (AGSHELL_ZIG or zig on PATH).
@@ -32,7 +32,7 @@ function Run([string]$file, [string[]]$arguments) {
 }
 
 if ($Publish) {
-    if ($Repository -notmatch '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$') { throw 'publishing requires -Repository OWNER/REPOSITORY for the chosen destination' }
+    if ($Repository -notmatch '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$') { throw 'publishing requires -Repository MelfisDrake/AgShell for the chosen destination' }
     if ($NoAot) { throw 'refusing to publish a release whose agshellctl is not Native AOT' }
     Step 'checking that main is clean and pushed'
     if (git -C $root status --porcelain) { throw 'the working tree has changes; commit them first' }

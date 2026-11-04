@@ -40,7 +40,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_VERSION: ${{ inputs.version }}
-        run: ./scripts/release.ps1 -Version $env:RELEASE_VERSION -Publish
+        run: ./scripts/release.ps1 -Version $env:RELEASE_VERSION -Publish -Repository MelfisDrake/AgShell
       - name: Upload release test diagnostics
         if: always()
         uses: actions/upload-artifact@v4

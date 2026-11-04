@@ -14,7 +14,6 @@ AppName=AgShell
 AppVersion={#AppVersion}
 AppVerName=AgShell {#AppVersion}
 AppPublisher=MelfisDrake
-; Draft destination: replace with the chosen public repository URL before publication.
 AppPublisherURL=https://github.com/MelfisDrake/AgShell
 DefaultDirName={localappdata}\Programs\AgShell
 DisableDirPage=auto

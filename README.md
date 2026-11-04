@@ -6,26 +6,26 @@ A Windows terminal built for working with several coding agents at once: session
 
 AgShell is an independent Windows implementation in C# based on the model and command conventions of [umputun/agterm](https://github.com/umputun/agterm) (macOS, MIT), with selected adapted components, scripts and tests. AgShell is a separate project and name; it is not affiliated with or endorsed by agterm. See [third-party notices](THIRD-PARTY-NOTICES.md) for attribution.
 
-**Status:** experimental 0.x software; this repository is being prepared for public opening. Verified usage is limited to Windows 11 x64 at 96 DPI. Back up your state and save shell work before upgrading. There is no support SLA or promise of compatibility across all systems.
+**Status:** experimental 0.x software; public source is available at [MelfisDrake/AgShell](https://github.com/MelfisDrake/AgShell). The first public binary release is being prepared; there are no public binaries yet. Verified usage is limited to Windows 11 x64 at 96 DPI. Back up your state and save shell work before upgrading. There is no support SLA or promise of compatibility across all systems.
 
 ## Installation
 
 Technical prerequisites: Windows x64 with ConPTY (Windows 10 1809+ API baseline), and the Microsoft Edge WebView2 Runtime. This is a technical baseline, not a Windows 10 support claim. The distributed self-contained build does not require a separate .NET SDK; building from source requires .NET SDK 10 and Node.js LTS.
 
-- **Installer** `agshell-<version>-setup.exe` from the future public repository’s Releases page (address pending). Installs per user without administrator rights and adds `agshellctl` to PATH. Optionally installs the agent status hooks and the skill for Claude Code and Codex right away, and registers the AgShell event log (this one asks for administrator rights).
+- **Installer** `agshell-<version>-setup.exe` will be available on the [Releases page](https://github.com/MelfisDrake/AgShell/releases) after the first public binary release. Installs per user without administrator rights and adds `agshellctl` to PATH. Optionally installs the agent status hooks and the skill for Claude Code and Codex right away, and registers the AgShell event log (this one asks for administrator rights).
 - **Portable** `agshell-<version>-win-x64.zip`: unpack anywhere and run `agshell.exe`. `agshellctl` on PATH, the hooks and the skill are installed from the command palette (Ctrl+Shift+P): “Add agshellctl to PATH”, “Install the agent status hooks”, “Install the AgShell skill for Claude Code and Codex”. The welcome window offers the same on first launch. Running them again is safe: “Add agshellctl to PATH” also takes other folders holding `agshellctl.exe` off the user’s PATH, and off the system PATH after a Windows administrator prompt (only when it has any; cancelling the prompt changes nothing), so an older copy is not found first.
 
 When upgrading from published 0.3.0, save your work and back up your state. Close the old windows before explicitly stopping their shared `agshell.exe --host`; the installer cannot reliably replace the running legacy host. Its live processes do not transfer to 0.4.0. See the [live restoration notes](docs/agshellctl.md) for the preserved legacy pane ids.
 
 Published 0.4.0 can remove web/themes before refusing to replace a busy file; close AgShell before rerunning that installer. The 0.4.1 installer fix restores the previous installation files after an ordinary refusal or cancellation and still removes outdated web/themes files on a successful upgrade. It needs temporary space for a copy of the existing installation. If restoration cannot finish, Setup reports the retained backup's location.
 
-Draft commands below require replacing `OWNER/REPOSITORY` with the chosen public address. The skill can also be installed as a plugin from this repository (use only one of the two ways, otherwise it is unclear which copy the agent picks up):
+The skill can also be installed as a plugin from this repository (use only one of the two ways, otherwise it is unclear which copy the agent picks up):
 
 ```
-claude plugin marketplace add OWNER/REPOSITORY
+claude plugin marketplace add MelfisDrake/AgShell
 claude plugin install agshell@agshell
 
-codex plugin marketplace add OWNER/REPOSITORY
+codex plugin marketplace add MelfisDrake/AgShell
 codex plugin add agshell@agshell
 ```
 
@@ -39,13 +39,13 @@ Uninstall removes the program, its shortcuts, Explorer entries and its directory
 
 ## Release status and tested scope
 
-This is a local source candidate for a new public repository; no public downloads are available at a selected address yet. The earlier private 0.5.0 release is retained separately and its assets are unchanged. It adds a shared title bar with native caption buttons, normal/compact/hidden modes, and toolbar actions for sessions, splits, overlays and Quick Terminal. The published portable and an upgrade on one Windows 11 workstation were checked; this is not a clean-machine installer certification.
+This repository publishes source, tests and build instructions. The first public binary release is being prepared separately; the Releases page currently has no downloadable binaries. Earlier versions mentioned in upgrade notes describe historical compatibility behavior and are not public downloads from this repository.
 
 Windows 10, other or mixed DPI, IME, accessibility, text scaling, high contrast, multiple monitors, sleep/logoff/reboot and the full graphics/transparency matrix remain unverified. Transparency without blur has known limitations. Earlier upgrade precautions above still apply. Compatible live daemons can preserve shells; incompatible builds require an explicit restart and process survival is not guaranteed.
 
 ## Bugs, contributions and security
 
-Use [CONTRIBUTING.md](CONTRIBUTING.md) for bug reports and small contributions, and [SECURITY.md](SECURITY.md) for security reporting readiness. Remove private terminal content, credentials and machine identifiers from attachments. Review of reports and fixes is best effort.
+Use [CONTRIBUTING.md](CONTRIBUTING.md) for bug reports and small contributions, and [SECURITY.md](SECURITY.md) for private security reporting. Remove private terminal content, credentials and machine identifiers from attachments. Review of reports and fixes is best effort.
 
 ## Documentation
 

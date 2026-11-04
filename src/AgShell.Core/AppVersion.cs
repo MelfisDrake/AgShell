@@ -3,7 +3,6 @@ namespace AgShell.Core
     /// <summary>What agterm's About panel and Help menu show: the version, the short commit, the project's pages.</summary>
     public static class AppVersion
     {
-        // Draft destination: this remains the private repository until the public address is chosen.
         public const string RepositoryUrl = "https://github.com/MelfisDrake/AgShell";
 
         /// <summary>The informational version "1.2.3+sha" split into the version and the short commit, as agterm's "1.2.3 (abc1234)".</summary>
