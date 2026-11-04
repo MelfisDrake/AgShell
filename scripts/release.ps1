@@ -58,15 +58,15 @@ if ($testExitCode -ne 0) { throw "dotnet test failed with exit code $testExitCod
 Step 'publishing agshell.exe (self-contained, single file)'
 Run dotnet @('publish', (Join-Path $root 'src\AgShell.App\AgShell.App.csproj'), '-c', 'Release', '-r', 'win-x64', '--self-contained',
     '-p:PublishSingleFile=true', '-p:IncludeNativeLibrariesForSelfExtract=true', '-p:EnableCompressionInSingleFile=true',
-    "-p:Version=$Version", "-p:RuntimeFrameworkVersion=$runtimeVersion", '-o', $app, '-nologo', '-v', 'q')
+    "-p:Version=$Version", "-p:AgShellReleaseRuntimeVersion=$runtimeVersion", '-o', $app, '-nologo', '-v', 'q')
 
 Step ($(if ($NoAot) { 'publishing agshellctl.exe (single file, no AOT)' } else { 'publishing agshellctl.exe (Native AOT)' }))
-$ctlArguments = @('publish', (Join-Path $root 'src\AgShell.Ctl\AgShell.Ctl.csproj'), '-c', 'Release', '-r', 'win-x64', "-p:Version=$Version", "-p:RuntimeFrameworkVersion=$runtimeVersion", '-o', $ctl, '-nologo', '-v', 'q')
+$ctlArguments = @('publish', (Join-Path $root 'src\AgShell.Ctl\AgShell.Ctl.csproj'), '-c', 'Release', '-r', 'win-x64', "-p:Version=$Version", "-p:AgShellReleaseRuntimeVersion=$runtimeVersion", '-o', $ctl, '-nologo', '-v', 'q')
 if ($NoAot) { $ctlArguments += @('-p:PublishAot=false', '--self-contained', '-p:PublishSingleFile=true', '-p:PublishTrimmed=true', '-p:EnableCompressionInSingleFile=true') }
 Run dotnet $ctlArguments
 
 Step ($(if ($NoAot) { 'publishing agshell-live.exe (single file, no AOT)' } else { 'publishing agshell-live.exe (Native AOT)' }))
-$liveArguments = @('publish', (Join-Path $root 'src\AgShell.Live\AgShell.Live.csproj'), '-c', 'Release', '-r', 'win-x64', "-p:Version=$Version", "-p:RuntimeFrameworkVersion=$runtimeVersion", '-o', $live, '-nologo', '-v', 'q')
+$liveArguments = @('publish', (Join-Path $root 'src\AgShell.Live\AgShell.Live.csproj'), '-c', 'Release', '-r', 'win-x64', "-p:Version=$Version", "-p:AgShellReleaseRuntimeVersion=$runtimeVersion", '-o', $live, '-nologo', '-v', 'q')
 if ($NoAot) { $liveArguments += @('-p:PublishAot=false', '--self-contained', '-p:PublishSingleFile=true', '-p:PublishTrimmed=true', '-p:EnableCompressionInSingleFile=true') }
 Run dotnet $liveArguments
 
