@@ -9,7 +9,7 @@ using Microsoft.Web.WebView2.Wpf;
 
 namespace AgShell.App.Tests
 {
-    public class NativePagesBridgeTests
+    public partial class NativePagesBridgeTests
     {
         [Fact]
         public async Task LocalBridgeStaysWithItsLiveDocument()
@@ -150,14 +150,14 @@ namespace AgShell.App.Tests
             }
         }
 
-        private static async Task UntilAsync(Func<bool> condition)
+        private static async Task UntilAsync(Func<bool> condition, [System.Runtime.CompilerServices.CallerArgumentExpression(nameof(condition))] string? expression = null)
         {
             DateTime deadline = DateTime.UtcNow.AddSeconds(15);
             while (!condition())
             {
                 if (DateTime.UtcNow >= deadline)
                 {
-                    throw new TimeoutException("Isolated WebView2 condition was not reached");
+                    throw new TimeoutException("Isolated WebView2 condition was not reached: " + expression);
                 }
 
                 await Task.Delay(25);

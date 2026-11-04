@@ -5,7 +5,8 @@
 MIT собственных вкладов, полная атрибуция source/distributions/отдельных hooks и skills,
 provenance runtime, узкие Source/registry/reply проверки HTML-моста, публичный адрес
 и приватный security channel. Локальный HTML остаётся доверенным и имеет командные
-полномочия. Исправление — defense in depth; remote exploit не установлен.
+полномочия. Source/registry/reply guard — defense in depth; remote exploit не установлен.
+Отдельно закрыта гонка закрытия HTML overlay во время async-инициализации WebView2.
 
 Нужны Windows x64, .NET SDK 10, Node.js LTS и WebView2 Runtime. Для нативной VT нужен
 Zig версии, закреплённой build-скриптом; для Native AOT — C++ build tools, для установщика — Inno Setup.

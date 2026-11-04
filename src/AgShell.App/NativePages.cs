@@ -109,7 +109,19 @@ namespace AgShell.App
                 page = new NativePage(overlayId, spec, overlay.BackgroundColor);
                 pages[overlayId] = page;
                 layer.Children.Add(page.View);
-                await InitializeAsync(page);
+                try
+                {
+                    await InitializeAsync(page);
+                }
+                catch (Exception ex) when (!IsCurrent(page) && ex is (InvalidOperationException or ArgumentException or COMException))
+                {
+                    return;
+                }
+            }
+
+            if (!IsCurrent(page))
+            {
+                return;
             }
 
             Canvas.SetLeft(page.View, bounds.X);
@@ -274,7 +286,7 @@ namespace AgShell.App
 
         private async Task ApplyThemeAsync(NativePage page)
         {
-            if (page.View.CoreWebView2 is not CoreWebView2 core)
+            if (!IsCurrent(page) || page.View.CoreWebView2 is not CoreWebView2 core)
             {
                 return;
             }
@@ -298,9 +310,24 @@ namespace AgShell.App
             // A local page's own styles always win over the theme, as agterm's: the theme sits in a cascade layer, which any
             // style of the page outranks.
             string json = System.Text.Json.JsonSerializer.Serialize(page.Spec.IsFile ? "@layer agshell-theme { " + style + " }" : style);
-            page.ThemeScript = await core.AddScriptToExecuteOnDocumentCreatedAsync(
-                // The document has no root element yet when this runs, so the rule goes in as an adopted sheet.
-                "(() => { const sheet = new CSSStyleSheet(); sheet.replaceSync(" + json + "); document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet]; })();");
+            string script;
+            try
+            {
+                script = await core.AddScriptToExecuteOnDocumentCreatedAsync(
+                    // The document has no root element yet when this runs, so the rule goes in as an adopted sheet.
+                    "(() => { const sheet = new CSSStyleSheet(); sheet.replaceSync(" + json + "); document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet]; })();");
+            }
+            catch (Exception ex) when (!IsCurrent(page) && ex is (InvalidOperationException or ArgumentException or COMException))
+            {
+                return;
+            }
+
+            if (!IsCurrent(page))
+            {
+                return;
+            }
+
+            page.ThemeScript = script;
             if (page.Spec.IsFile && !first)
             {
                 core.Reload();
@@ -358,18 +385,32 @@ namespace AgShell.App
                 return;
             }
 
+            if (!IsCurrent(page))
+            {
+                return;
+            }
+
             CoreWebView2 core = page.View.CoreWebView2;
             // A local page always runs the bridge; without --js its documents' Content-Security-Policy runs none of their own scripts.
             core.Settings.IsScriptEnabled = page.Spec.Js || page.Spec.IsFile;
             if (page.Spec.IsFile && pageHost is not null)
             {
                 await core.AddScriptToExecuteOnDocumentCreatedAsync(pageHost.BridgeScript);
+                if (!IsCurrent(page))
+                {
+                    return;
+                }
             }
 
             // agterm's runOpenPanelWith answers nil: a page opens no file chooser. WebView2 has no event for the chooser of a
             // file input, so every document refuses it itself: a click on a file input or a label for one, a key that would
             // open it, and showPicker.
             await core.AddScriptToExecuteOnDocumentCreatedAsync(FileChooserGuard);
+            if (!IsCurrent(page))
+            {
+                return;
+            }
+
             string start = page.Spec.Source;
             if (page.Spec.IsFile && pageHost is not null)
             {
@@ -414,6 +455,11 @@ namespace AgShell.App
             };
             page.View.ZoomFactor = zoom;
             await ApplyThemeAsync(page);
+            if (!IsCurrent(page))
+            {
+                return;
+            }
+
             // agterm's current page: what a document of the page shows. Chromium's own error page is no document of it, so a
             // failed load leaves the last one in place, or none.
             void Report()
@@ -593,6 +639,12 @@ namespace AgShell.App
             {
                 // A message the bridge did not write: the page's own script, or a broken one.
             }
+        }
+
+        private bool IsCurrent(NativePage page)
+        {
+            return pages.TryGetValue(page.OverlayId, out NativePage? live) && ReferenceEquals(page, live)
+                && findPage(page.OverlayId)?.Page is not null;
         }
 
         private bool CanBridge(NativePage page, string source)

@@ -49,7 +49,7 @@ Windows 10, другие и смешанные DPI, IME, accessibility, масш
 
 - Собственные вклады теперь под MIT. Полная атрибуция upstream, включая адаптированную иконку agterm, включена в исходники, ZIP/setup и отдельные установки хуков/скиллов.
 - Provenance runtime и оригинальные тексты лицензий описывают включённый .NET runtime 10.0.14, Windows SDK projections/CsWinRT и прямые пакеты; release publish закрепляет эту версию runtime.
-- Мост локального HTML проверяет Source сообщения, registry живого overlay и адрес ответа. Локальный HTML остаётся доверенным и имеет командные полномочия, в том числе без `--js`; это defense in depth, remote exploit не установлен.
+- Мост локального HTML проверяет Source сообщения, registry живого overlay и адрес ответа. Локальный HTML остаётся доверенным и имеет командные полномочия, в том числе без `--js`; это defense in depth, remote exploit не установлен. Закрытие overlay во время асинхронной инициализации браузера также останавливает его продолжение до обращения к disposed WebView2.
 - Исходники и загрузки используют [MelfisDrake/AgShell](https://github.com/MelfisDrake/AgShell); приватные сообщения об уязвимостях — [GitHub Security Advisories](https://github.com/MelfisDrake/AgShell/security/advisories/new), согласно SECURITY.ru.md.
 
 Portable проходит smoke в отдельном профиле. Setup скомпилирован и проверен статически; запуск установщика, runtime upgrade и регистрация в этом выпуске не проверены. Scope Windows 11 x64 / 96 DPI и непроверенная матрица выше сохраняются.
