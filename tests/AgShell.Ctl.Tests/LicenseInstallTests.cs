@@ -21,7 +21,8 @@ namespace AgShell.Ctl.Tests
                 Assert.Equal(2, report.Installed.Count);
                 foreach (SkillReport.Install target in report.Installed)
                 {
-                    AssertLicense(File.ReadAllText(Path.Combine(target.Path, "LICENSE-agterm")));
+                    Assert.Contains("Copyright (c) 2026 Umputun", File.ReadAllText(Path.Combine(target.Path, "LICENSE-agterm")));
+                    AssertOwnLicense(File.ReadAllText(Path.Combine(target.Path, "LICENSE")));
                 }
 
                 AgentHome agent = new AgentHome("test", home, null, string.Empty, "agshellctl", "agshellctl");
@@ -48,12 +49,20 @@ namespace AgShell.Ctl.Tests
             }
         }
 
+        private static void AssertOwnLicense(string text)
+        {
+            string upstream = Encoding.UTF8.GetString(Assert.Single(SkillInstall.BundledFiles(), file => file.Relative == "LICENSE-agterm").Content).Replace("\r\n", "\n").Trim();
+            string own = upstream.Replace("Copyright (c) 2026 Umputun", "Copyright (c) 2026 MelfisDrake");
+            Assert.Contains(own, text.Replace("\r\n", "\n").Replace("Copyright (c) 2026 Umputun\n", string.Empty));
+        }
+
         private static void AssertLicense(string text)
         {
             string normalized = string.Join("\n", text.Replace("\r\n", "\n").Split('\n').Select(line => line.TrimStart(' ', '#', '/')));
             string upstream = Encoding.UTF8.GetString(Assert.Single(SkillInstall.BundledFiles(), file => file.Relative == "LICENSE-agterm").Content).Replace("\r\n", "\n").Trim();
             Assert.Contains("Copyright (c) 2026 Umputun", normalized);
-            Assert.Contains(upstream, normalized);
+            Assert.Contains(upstream, normalized.Replace("Copyright (c) 2026 MelfisDrake\n", string.Empty));
+            AssertOwnLicense(normalized);
         }
     }
 }
