@@ -6,14 +6,14 @@ A Windows terminal built for working with several coding agents at once: session
 
 AgShell is an independent Windows implementation in C# based on the model and command conventions of [umputun/agterm](https://github.com/umputun/agterm) (macOS, MIT), with selected adapted components, scripts and tests. AgShell is a separate project and name; it is not affiliated with or endorsed by agterm. See [third-party notices](THIRD-PARTY-NOTICES.md) for attribution.
 
-**Status:** experimental 0.x software; public source is available at [MelfisDrake/AgShell](https://github.com/MelfisDrake/AgShell). The first public binary release is being prepared; there are no public binaries yet. Verified usage is limited to Windows 11 x64 at 96 DPI. Back up your state and save shell work before upgrading. There is no support SLA or promise of compatibility across all systems.
+**Status:** experimental 0.x software; public source is available at [MelfisDrake/AgShell](https://github.com/MelfisDrake/AgShell). Version [0.5.1](https://github.com/MelfisDrake/AgShell/releases/tag/v0.5.1) is the first public binary release. Verified usage is limited to Windows 11 x64 at 96 DPI. Back up your state and save shell work before upgrading. There is no support SLA or promise of compatibility across all systems.
 
 ## Installation
 
 Technical prerequisites: Windows x64 with ConPTY (Windows 10 1809+ API baseline), and the Microsoft Edge WebView2 Runtime. This is a technical baseline, not a Windows 10 support claim. The distributed self-contained build does not require a separate .NET SDK; building from source requires .NET SDK 10 and Node.js LTS.
 
-- **Installer** `agshell-<version>-setup.exe` will be available on the [Releases page](https://github.com/MelfisDrake/AgShell/releases) after the first public binary release. Installs per user without administrator rights and adds `agshellctl` to PATH. Optionally installs the agent status hooks and the skill for Claude Code and Codex right away, and registers the AgShell event log (this one asks for administrator rights).
-- **Portable** `agshell-<version>-win-x64.zip`: unpack anywhere and run `agshell.exe`. `agshellctl` on PATH, the hooks and the skill are installed from the command palette (Ctrl+Shift+P): “Add agshellctl to PATH”, “Install the agent status hooks”, “Install the AgShell skill for Claude Code and Codex”. The welcome window offers the same on first launch. Running them again is safe: “Add agshellctl to PATH” also takes other folders holding `agshellctl.exe` off the user’s PATH, and off the system PATH after a Windows administrator prompt (only when it has any; cancelling the prompt changes nothing), so an older copy is not found first.
+- **Installer** `agshell-0.5.1-setup.exe` is available on the [Releases page](https://github.com/MelfisDrake/AgShell/releases/tag/v0.5.1). Installs per user without administrator rights and adds `agshellctl` to PATH. Optionally installs the agent status hooks and the skill for Claude Code and Codex right away, and registers the AgShell event log (this one asks for administrator rights).
+- **Portable** `agshell-0.5.1-win-x64.zip`: unpack anywhere and run `agshell.exe`. `agshellctl` on PATH, the hooks and the skill are installed from the command palette (Ctrl+Shift+P): “Add agshellctl to PATH”, “Install the agent status hooks”, “Install the AgShell skill for Claude Code and Codex”. The welcome window offers the same on first launch. Running them again is safe: “Add agshellctl to PATH” also takes other folders holding `agshellctl.exe` off the user’s PATH, and off the system PATH after a Windows administrator prompt (only when it has any; cancelling the prompt changes nothing), so an older copy is not found first.
 
 When upgrading from published 0.3.0, save your work and back up your state. Close the old windows before explicitly stopping their shared `agshell.exe --host`; the installer cannot reliably replace the running legacy host. Its live processes do not transfer to 0.4.0. See the [live restoration notes](docs/agshellctl.md) for the preserved legacy pane ids.
 
@@ -31,7 +31,7 @@ codex plugin add agshell@agshell
 
 The interface speaks Russian or English: Settings → General → Language; by default it follows Windows. `agshellctl` output is in English.
 
-Future distributions must include `LICENSE`, `THIRD-PARTY-NOTICES.md` and `licenses/` with the bundled components' license texts. Keep them with the portable files when redistributing them.
+Distributions include `LICENSE`, `THIRD-PARTY-NOTICES.md` and `licenses/` with the bundled components' license texts. Keep them with the portable files when redistributing them.
 
 Builds are unsigned; SmartScreen may warn about an unknown publisher. Verify the download source and published asset digest before deciding to run it. Before uninstalling, remove the hooks from `~/.claude/settings.json` (and `~/.codex/config.toml`, the Pi extension and the OpenCode plugin, if installed), otherwise the agents will keep calling a missing `agshellctl`.
 
@@ -39,9 +39,20 @@ Uninstall removes the program, its shortcuts, Explorer entries and its directory
 
 ## Release status and tested scope
 
-This repository publishes source, tests and build instructions. The first public binary release is being prepared separately; the Releases page currently has no downloadable binaries. Earlier versions mentioned in upgrade notes describe historical compatibility behavior and are not public downloads from this repository.
+Version 0.5.1 publishes the first public Windows x64 ZIP and setup alongside source, tests and build instructions. Earlier versions mentioned in upgrade notes describe historical compatibility behavior and are not public downloads from this repository.
 
 Windows 10, other or mixed DPI, IME, accessibility, text scaling, high contrast, multiple monitors, sleep/logoff/reboot and the full graphics/transparency matrix remain unverified. Transparency without blur has known limitations. Earlier upgrade precautions above still apply. Compatible live daemons can preserve shells; incompatible builds require an explicit restart and process survival is not guaranteed.
+
+## 0.5.1 release
+
+Compared with the previously installed 0.5.0:
+
+- Own contributions now use MIT. Full upstream attribution, including the adapted agterm icon, is included in source, ZIP/setup and standalone hook/skill installs.
+- The runtime provenance and original license texts cover the bundled .NET 10.0.14 runtime and direct packages; release publishing pins that runtime version.
+- The local HTML bridge checks the message Source, the live overlay registry and the reply destination. Local HTML remains trusted and has command access, including without `--js`; this is defense in depth, with no remote exploit established.
+- Source and downloads use [MelfisDrake/AgShell](https://github.com/MelfisDrake/AgShell); private security reports use [GitHub Security Advisories](https://github.com/MelfisDrake/AgShell/security/advisories/new), as described in SECURITY.md.
+
+The portable build receives an isolated smoke check. Setup is compiled and checked statically; installer execution, runtime upgrade and registration are not verified for this release. The Windows 11 x64 / 96 DPI scope and unverified matrix above remain in effect.
 
 ## Bugs, contributions and security
 

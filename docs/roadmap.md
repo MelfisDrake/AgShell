@@ -8,9 +8,11 @@ MIT собственных вкладов и лицензии upstream. Публ
 https://github.com/MelfisDrake/AgShell; приватные сообщения об уязвимостях — через GitHub
 согласно SECURITY.md. Подготовка исходного снимка завершена.
 
-Следующий отдельный этап — первый публичный бинарный выпуск: сборка VT/AOT/installer,
-проверка конечных ZIP/setup, фактических runtime notices и сценариев обновления.
-Бинарные выпуски этим исходным снимком не объявляются готовыми.
+Этап 0.5.1 — первый публичный бинарный выпуск с MIT/полной атрибуцией и узким
+HTML bridge guard: штатная сборка VT/AOT/installer, runtime provenance и проверка
+конечных ZIP/setup. Notes и процедура выпуска подготовлены в README и release.md.
+Установка и проверка runtime upgrade/регистрации — следующий отдельный этап;
+полная Windows/DPI/IME/accessibility/alpha матрица остаётся открытой.
 
 Публичные пределы проверки: [sanitation-summary.md](sanitation-summary.md).
 Архитектура: [decisions/](decisions/). Сборка: [release.md](release.md).
