@@ -1,0 +1,108 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>agshell</AssemblyName>
+    <RootNamespace>AgShell.App</RootNamespace>
+    <StartupObject>AgShell.App.Program</StartupObject>
+    <WebDir>$(MSBuildThisFileDirectory)..\web\</WebDir>
+    <ApplicationIcon>Assets\agshell.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4258.31" />
+    <PackageReference Include="CommunityToolkit.WinUI.Notifications" Version="7.1.2" />
+    <!-- Windows Terminal's ConPTY: the system one drops OSC 52 reads and OSC answers to programs. Taken by hand, next to the exe. -->
+    <PackageReference Include="Microsoft.Windows.Console.ConPTY" Version="1.24.261001001" ExcludeAssets="all" GeneratePathProperty="true" />
+  </ItemGroup>
+
+  <!-- conpty.dll starts OpenConsole.exe from its own folder, so both stay loose files beside agshell.exe, out of the single file. -->
+  <ItemGroup>
+    <None Include="$(PkgMicrosoft_Windows_Console_ConPTY)\runtimes\win-x64\native\conpty.dll" Link="conpty.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" Visible="false" />
+    <None Include="$(PkgMicrosoft_Windows_Console_ConPTY)\build\native\runtimes\x64\OpenConsole.exe" Link="OpenConsole.exe" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\agshell.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AgShell.Core\AgShell.Core.csproj" />
+    <ProjectReference Include="..\AgShell.Pty\AgShell.Pty.csproj" />
+    <!-- Built alongside so agshellctl.exe lands next to agshell.exe; sessions get this directory on PATH. -->
+    <ProjectReference Include="..\AgShell.Ctl\AgShell.Ctl.csproj" />
+    <!-- The live panes' daemon, started from beside agshell.exe (from a copy of it, see LiveDaemonCopy). -->
+    <ProjectReference Include="..\AgShell.Live\AgShell.Live.csproj" />
+    <!-- The event log provider's resources and manifest (ADR 0011): loose files beside agshell.exe, registered by wevtutil. -->
+    <ProjectReference Include="..\AgShell.EventLog\AgShell.EventLog.csproj" ReferenceOutputAssembly="false" GlobalPropertiesToRemove="RuntimeIdentifier;SelfContained" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\AgShell.EventLog\bin\$(Configuration)\AgShell.EventLog.dll" Link="AgShell.EventLog.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" Visible="false" />
+    <None Include="..\AgShell.EventLog\AgShell.man" Link="AgShell.man" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" Visible="false" />
+  </ItemGroup>
+
+  <!--
+    agterm's zmx BUILD stamp: the daemon's build id is a digest of the sources it is built from, so it moves only when the
+    daemon does; the app reads it as the LiveBuild assembly metadata and dates its change in live-build.json.
+  -->
+  <ItemGroup>
+    <LiveBuildSource Include="..\AgShell.Live\**\*.cs;..\AgShell.Live\*.csproj;..\AgShell.Pty\**\*.cs;..\AgShell.Pty\*.csproj;..\AgShell.Protocol\**\*.cs;..\AgShell.Protocol\*.csproj;..\..\Directory.Build.props"
+                     Exclude="..\AgShell.Live\obj\**;..\AgShell.Live\bin\**;..\AgShell.Pty\obj\**;..\AgShell.Pty\bin\**;..\AgShell.Protocol\obj\**;..\AgShell.Protocol\bin\**" />
+  </ItemGroup>
+
+  <Target Name="LiveBuildId" BeforeTargets="GetAssemblyAttributes">
+    <GetFileHash Files="@(LiveBuildSource)" Algorithm="SHA256">
+      <Output TaskParameter="Items" ItemName="LiveBuildHashed" />
+    </GetFileHash>
+    <WriteLinesToFile File="$(IntermediateOutputPath)live-build.txt" Lines="@(LiveBuildHashed->'%(Identity) %(FileHash)')" Overwrite="true" WriteOnlyWhenDifferent="true" />
+    <GetFileHash Files="$(IntermediateOutputPath)live-build.txt" Algorithm="SHA256">
+      <Output TaskParameter="Hash" PropertyName="LiveBuildHash" />
+    </GetFileHash>
+    <ItemGroup>
+      <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+        <_Parameter1>LiveBuild</_Parameter1>
+        <_Parameter2>$(LiveBuildHash.Substring(0, 12).ToLowerInvariant())</_Parameter2>
+      </AssemblyAttribute>
+    </ItemGroup>
+  </Target>
+
+  <ItemGroup>
+    <WebSource Include="$(WebDir)src\**\*;$(WebDir)public\**\*;$(WebDir)scripts\**\*;$(WebDir)index.html;$(WebDir)package.json;$(WebDir)package-lock.json;$(WebDir)vite.config.ts;$(WebDir)tsconfig.json" />
+  </ItemGroup>
+
+  <Target Name="BuildWeb" BeforeTargets="BeforeBuild" Inputs="@(WebSource)" Outputs="$(WebDir)dist\index.html" Condition="'$(SkipWebBuild)' != 'true'">
+    <Exec Command="npm ci --no-fund --no-audit" WorkingDirectory="$(WebDir)" Condition="!Exists('$(WebDir)node_modules')" />
+    <Exec Command="npm run build" WorkingDirectory="$(WebDir)" />
+  </Target>
+
+  <!-- Bundled themes, flat in themes\ as agterm keeps them: Ghostty's set plus agshell's default. -->
+  <ItemGroup>
+    <BundledTheme Include="$(MSBuildThisFileDirectory)..\themes\ghostty\*;$(MSBuildThisFileDirectory)..\themes\agshell" />
+  </ItemGroup>
+
+  <Target Name="CopyThemes" AfterTargets="Build">
+    <Copy SourceFiles="@(BundledTheme)" DestinationFolder="$(OutDir)themes" SkipUnchangedFiles="true" />
+  </Target>
+
+  <!-- A published build carries the page and the themes next to agshell.exe too; they are files, not part of the single file. -->
+  <Target Name="PublishWebAndThemes" AfterTargets="Publish">
+    <ItemGroup>
+      <PublishedWeb Include="$(WebDir)dist\**\*" />
+    </ItemGroup>
+    <RemoveDir Directories="$(PublishDir)web" />
+    <Copy SourceFiles="@(PublishedWeb)" DestinationFiles="@(PublishedWeb->'$(PublishDir)web\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(BundledTheme)" DestinationFolder="$(PublishDir)themes" />
+  </Target>
+
+  <Target Name="CopyWeb" AfterTargets="Build">
+    <ItemGroup>
+      <WebDist Include="$(WebDir)dist\**\*" />
+    </ItemGroup>
+    <RemoveDir Directories="$(OutDir)web" />
+    <Copy SourceFiles="@(WebDist)" DestinationFiles="@(WebDist->'$(OutDir)web\%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
+
+</Project>

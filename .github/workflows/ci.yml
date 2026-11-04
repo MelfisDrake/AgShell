@@ -1,0 +1,29 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      # agshell-vt.dll, the live daemon's terminal state, builds with the Zig that ghostty pins.
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: 0.16.0
+      - name: agshell-vt
+        shell: pwsh
+        run: ./scripts/build-agshell-vt.ps1
+      - name: Build
+        run: dotnet build agshell.slnx -c Release -nologo
+      - name: Test
+        run: dotnet test agshell.slnx -c Release --no-build -nologo --logger "console;verbosity=detailed"

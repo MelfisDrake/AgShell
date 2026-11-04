@@ -1,0 +1,27 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "agshell",
+  "owner": {
+    "name": "MelfisDrake"
+  },
+  "metadata": {
+    "description": "The AgShell agent skill: drive the AgShell Windows terminal through agshellctl."
+  },
+  "plugins": [
+    {
+      "name": "agshell",
+      "source": "./plugins/agshell",
+      "description": "Drive AgShell, a Windows terminal for coding agents, through its agshellctl CLI and control pipe.",
+      "author": {
+        "name": "MelfisDrake"
+      },
+      "category": "productivity",
+      "keywords": [
+        "agshell",
+        "terminal",
+        "windows",
+        "automation"
+      ]
+    }
+  ]
+}

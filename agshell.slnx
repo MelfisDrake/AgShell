@@ -1,0 +1,19 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/AgShell.App/AgShell.App.csproj" />
+    <Project Path="src/AgShell.Core/AgShell.Core.csproj" />
+    <Project Path="src/AgShell.Ctl/AgShell.Ctl.csproj" />
+    <Project Path="src/AgShell.EventLog/AgShell.EventLog.csproj" />
+    <Project Path="src/AgShell.Live/AgShell.Live.csproj" />
+    <Project Path="src/AgShell.Protocol/AgShell.Protocol.csproj" />
+    <Project Path="src/AgShell.Pty/AgShell.Pty.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/AgShell.App.Tests/AgShell.App.Tests.csproj" />
+    <Project Path="tests/AgShell.Core.Tests/AgShell.Core.Tests.csproj" />
+    <Project Path="tests/AgShell.Ctl.Tests/AgShell.Ctl.Tests.csproj" />
+    <Project Path="tests/AgShell.Live.Tests/AgShell.Live.Tests.csproj" />
+    <Project Path="tests/AgShell.Protocol.Tests/AgShell.Protocol.Tests.csproj" />
+    <Project Path="tests/AgShell.Pty.Tests/AgShell.Pty.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,26 @@
+name: Bug report / Ошибка
+description: Reproducible non-security bug / Воспроизводимая ошибка без security details
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: "Experimental software; best-effort support. For vulnerabilities read SECURITY.md first. Remove secrets and private data from all attachments. / Экспериментальный продукт; поддержка по возможности. Для уязвимостей сначала прочитайте SECURITY.ru.md. Удалите секреты и приватные данные из вложений."
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment / Окружение
+      description: AgShell version, installer/portable, Windows, shell; DPI/monitors/layout/IME for UI bugs.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction / Воспроизведение
+      description: Minimal steps, expected and actual result / Шаги, ожидаемый и фактический результат.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Sanitized evidence / Очищенные доказательства
+      description: Optional logs or screenshots; no credentials, private messages or machine/session identifiers.

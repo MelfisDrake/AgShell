@@ -1,0 +1,18 @@
+.{
+    .name = .agshell_vt,
+    .version = "0.1.0",
+    .fingerprint = 0x43cd3162275c9752,
+    .minimum_zig_version = "0.16.0",
+    .dependencies = .{
+        // The ghostty revision zmx 8bab1f0 pins, checked out and patched by scripts/build-agshell-vt.ps1 as agterm's
+        // setup.sh does with zmx-ghostty.
+        .ghostty = .{
+            .path = "../../.build/agshell-vt/ghostty",
+        },
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}

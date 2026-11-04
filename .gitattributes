@@ -1,0 +1,9 @@
+* text=auto eol=lf
+*.sln text eol=crlf
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Retain original NuGet notice bytes and their provenance hashes.
+licenses/dotnet-runtime-MIT.txt -text whitespace=cr-at-eol
+licenses/dotnet-runtime-THIRD-PARTY-NOTICES.txt -text whitespace=cr-at-eol
+licenses/dotnet-windowsdesktop-MIT.txt -text whitespace=cr-at-eol

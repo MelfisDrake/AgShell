@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <AssemblyName>agshell-live</AssemblyName>
+    <RootNamespace>AgShell.Live</RootNamespace>
+    <PublishAot>true</PublishAot>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Windows Terminal's ConPTY, as the app's: the system one drops OSC 52 reads and OSC answers to programs. -->
+    <PackageReference Include="Microsoft.Windows.Console.ConPTY" Version="1.24.261001001" ExcludeAssets="all" GeneratePathProperty="true" />
+  </ItemGroup>
+
+  <!-- conpty.dll starts OpenConsole.exe from its own folder, so both stay beside agshell-live.exe. -->
+  <ItemGroup>
+    <None Include="$(PkgMicrosoft_Windows_Console_ConPTY)\runtimes\win-x64\native\conpty.dll" Link="conpty.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" Visible="false" />
+    <None Include="$(PkgMicrosoft_Windows_Console_ConPTY)\build\native\runtimes\x64\OpenConsole.exe" Link="OpenConsole.exe" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" Visible="false" />
+  </ItemGroup>
+
+  <!-- agshell-vt.dll, the pane's terminal state as zmx keeps it with ghostty-vt, built by scripts\build-agshell-vt.ps1. -->
+  <PropertyGroup>
+    <AgShellVt>$(MSBuildThisFileDirectory)..\..\.build\agshell-vt\out\bin\agshell-vt.dll</AgShellVt>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="$(AgShellVt)" Link="agshell-vt.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" Visible="false" />
+  </ItemGroup>
+  <Target Name="RequireAgShellVt" BeforeTargets="BeforeBuild" Condition="!Exists('$(AgShellVt)')">
+    <Error Text="agshell-vt.dll is missing: run scripts\build-agshell-vt.ps1 first" />
+  </Target>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="AgShell.Live.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AgShell.Protocol\AgShell.Protocol.csproj" />
+    <ProjectReference Include="..\AgShell.Pty\AgShell.Pty.csproj" />
+  </ItemGroup>
+
+</Project>

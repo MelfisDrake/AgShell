@@ -1,0 +1,16 @@
+{
+  "name": "agshell",
+  "description": "Drive AgShell, a Windows terminal for coding agents, through its agshellctl CLI and control pipe.",
+  "author": {
+    "name": "MelfisDrake"
+  },
+  "keywords": [
+    "agshell",
+    "terminal",
+    "windows",
+    "automation"
+  ],
+  "skills": [
+    "./skills/agshell"
+  ]
+}

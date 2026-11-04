@@ -1,0 +1,1956 @@
+:root {
+  --terminal-bg: #1b1a18;
+  --sidebar-bg: #22201e;
+  --row-hover: #2c2a27;
+  --row-selected: #3b3732;
+  --row-selected-text: var(--text);
+  --border: #302d29;
+  --text: #e6e1d7;
+  --muted: #918a80;
+  --accent: #e3a35a;
+  --danger: #e2705f;
+  --status-active: #dbd9e6;
+  --status-blocked: #ff9f0a;
+  --status-completed: #30d158;
+  --menu-bg: #2a2825;
+  --ui-font: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  color: var(--text);
+  font: 13px/1.4 var(--ui-font);
+  user-select: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+svg {
+  flex: none;
+}
+
+.app {
+  display: flex;
+  height: 100%;
+}
+
+/* The window's background, painted around the holes native pages show through (holes.ts). */
+.app::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--root-bg, var(--terminal-bg));
+  clip-path: var(--holes, none);
+  pointer-events: none;
+}
+
+/* sidebar */
+
+.sidebar {
+  font-size: var(--sidebar-font-size, 13px);
+  position: relative;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
+  min-width: 140px;
+}
+
+/* agterm: the tree is inset 8 from the left and 2 from the top, its rows run on without gaps. */
+.tree {
+  flex: 1;
+  overflow-y: auto;
+  padding: 2px 0 8px 8px;
+}
+
+.workspace {
+  position: relative;
+}
+
+.workspace.dragging {
+  opacity: 0.4;
+}
+
+.workspace.drop-before::before,
+.workspace.drop-after::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  height: 2px;
+  background: var(--system-accent);
+  pointer-events: none;
+}
+
+.workspace.drop-before::before {
+  top: -4px;
+}
+
+.workspace.drop-after::after {
+  bottom: -4px;
+}
+
+/* agterm's row: the sidebar font size plus 15 high, its pill inset 8 at the sides and 1.5 at the top and bottom, radius 7. */
+.workspace-header,
+.session-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-sizing: border-box;
+  height: var(--sidebar-row-height, 28px);
+  margin: 0 8px;
+  padding: 0 6px;
+  border-top: 1.5px solid transparent;
+  border-bottom: 1.5px solid transparent;
+  background-clip: padding-box;
+  border-radius: 7px;
+  cursor: default;
+}
+
+/* the disclosure chevron sits left of the pill, as AppKit's triangle does */
+.workspace-header .chevron {
+  margin-left: -14px;
+}
+
+.workspace-header {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.workspace-header:hover,
+.session-row:hover {
+  background: var(--row-hover);
+}
+
+.workspace-header.drop-into {
+  background: var(--row-selected);
+  color: var(--row-selected-text);
+  outline: 1px dashed var(--system-accent);
+}
+
+.chevron {
+  display: flex;
+  width: 14px;
+}
+
+.workspace-name,
+.session-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* agterm: the workspace's "+" shows on hover only and takes no room otherwise. */
+.row-action {
+  display: none;
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--text);
+  opacity: 0.6;
+}
+
+.workspace-header:hover .row-action {
+  display: flex;
+}
+
+.row-action:hover {
+  background: var(--row-selected);
+  color: var(--row-selected-text);
+}
+
+.session-row {
+  padding-left: 22px;
+  position: relative;
+}
+
+.session-row.selected {
+  background: var(--sidebar-selected);
+  color: var(--row-selected-text);
+}
+
+.window-inactive .session-row.selected {
+  background: var(--sidebar-selected-inactive);
+}
+
+/* agterm's animated expand and collapse (NSAnimationContext's 0.25 s), kept under Reduce Motion as there. */
+.workspace-sessions {
+  display: grid;
+  grid-template-rows: 1fr;
+}
+
+.workspace-sessions.folded {
+  grid-template-rows: 0fr;
+}
+
+.workspace-sessions.animating {
+  transition: grid-template-rows 0.25s ease-in-out;
+}
+
+.workspace-sessions-inner {
+  min-height: 0;
+}
+
+.workspace-sessions.animating > .workspace-sessions-inner {
+  overflow: hidden;
+}
+
+.session-row.dragging {
+  opacity: 0.4;
+}
+
+.session-row.drop-before::before,
+.session-row.drop-after::after {
+  content: "";
+  position: absolute;
+  left: 18px;
+  right: 4px;
+  height: 2px;
+  background: var(--system-accent);
+  border-radius: 1px;
+}
+
+.session-row.drop-before::before {
+  top: -1px;
+}
+
+.session-row.drop-after::after {
+  bottom: -1px;
+}
+
+/* agterm: row icons in the text's colour, faded to 0.6, 0.85 on the selected row. */
+.session-icon,
+.row-icon,
+.chevron {
+  display: flex;
+  flex: none;
+  color: var(--text);
+  opacity: 0.6;
+}
+
+/* agterm's disclosure triangle is AppKit's, in the system gray of the sidebar's light or dark appearance. */
+.chevron {
+  color: var(--chevron);
+  opacity: 1;
+}
+
+.session-row.selected .session-icon {
+  color: var(--row-selected-text);
+  opacity: 0.85;
+}
+
+.status {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+
+.inline-edit {
+  flex: 1;
+  min-width: 0;
+  height: 22px;
+  padding: 0 4px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--terminal-bg);
+  color: var(--text);
+  font: inherit;
+  outline: none;
+  user-select: text;
+}
+
+.sidebar-footer {
+  display: flex;
+  gap: 2px;
+  padding: 6px;
+  border-top: 1px solid var(--border);
+}
+
+.split-button {
+  display: flex;
+}
+
+.icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 26px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--muted);
+}
+
+.icon-button.narrow {
+  width: 20px;
+}
+
+button:focus-visible {
+  outline: 1px solid var(--system-accent);
+  outline-offset: 1px;
+}
+
+.resize-handle {
+  position: absolute;
+  top: 0;
+  right: -3px;
+  bottom: 0;
+  width: 6px;
+  cursor: col-resize;
+  z-index: 2;
+}
+
+/* terminals */
+
+.terminal-pane {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+.main-column {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* The sidebar footer uses the terminal foreground. */
+
+.sidebar-footer .icon-button {
+  color: var(--text);
+}
+
+
+/* Ghostty's window-padding, agterm's 8 and 6 points unless ghostty.conf says otherwise. */
+.terminal-stack {
+  position: absolute;
+  inset: var(--terminal-padding, 6px 8px 6px 8px);
+}
+
+/* mouse-hide-while-typing */
+.terminal-host.typing,
+.terminal-host.typing * {
+  cursor: none !important;
+}
+
+.terminal-host {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+}
+
+/* agterm's mute wash: the split pane without focus fades under the terminal background. */
+.terminal-host.muted::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  /* agterm's paneDim washes in the pane's own background, so only the text fades. */
+  background: var(--mute-color, var(--terminal-bg));
+  opacity: var(--pane-mute, 0.4);
+  pointer-events: none;
+}
+
+.terminal-host.active {
+  visibility: visible;
+}
+
+/* agterm's session background: an image or text under a transparent grid. */
+.terminal-host {
+  container-type: size;
+}
+
+.terminal-host > .backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.terminal-host > .xterm {
+  position: relative;
+}
+
+.empty-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--muted);
+}
+
+.empty-state p {
+  margin: 0;
+}
+
+
+
+.text-button {
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--accent);
+}
+
+.text-button:hover {
+  background: var(--row-hover);
+}
+
+kbd {
+  margin-left: 6px;
+  padding: 1px 5px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font: 11px var(--ui-font);
+  color: var(--muted);
+}
+
+/* menu */
+
+.menu-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.menu {
+  position: fixed;
+  min-width: 200px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--menu-bg);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.45);
+  pointer-events: auto;
+}
+
+.menu-item {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  height: 28px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 5px;
+  background: none;
+  text-align: left;
+  align-items: center;
+}
+
+.menu-item.active {
+  background: var(--row-selected);
+  color: var(--row-selected-text);
+}
+
+.menu-item:disabled {
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+.menu-item.danger {
+  color: var(--danger);
+}
+
+.menu-arrow {
+  color: var(--muted);
+}
+
+.menu-item.active .menu-arrow {
+  color: inherit;
+}
+
+.menu-separator {
+  height: 1px;
+  margin: 4px 6px;
+  background: var(--border);
+}
+
+.switcher-rows {
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.switcher-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: round(calc(6px * var(--unit)), 1px) round(calc(12px * var(--unit)), 1px);
+  border-radius: 6px;
+}
+
+.session-row-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.session-row-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.switcher-title svg {
+  flex: none;
+  width: 1em;
+  height: 1em;
+}
+
+/* agterm: a tint of the system accent over the row, the text keeps its colours. */
+.switcher-row.selected {
+  background: color-mix(in srgb, var(--system-accent) 25%, transparent);
+}
+
+.switcher-title {
+  display: flex;
+  align-items: center;
+  gap: round(calc(4px * var(--unit, 1)), 1px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.switcher-subtitle {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: max(8px, round(calc(10px * var(--unit, 1)), 1px));
+  white-space: pre;
+}
+
+.status.agent-active {
+  background: var(--status-active);
+}
+
+.status.agent-blocked {
+  background: var(--status-blocked);
+}
+
+.status.agent-completed {
+  background: var(--status-completed);
+}
+
+.status.shape-square {
+  border-radius: 1.5px;
+}
+
+.status.shape-diamond {
+  width: 7px;
+  height: 7px;
+  border-radius: 1px;
+  transform: rotate(45deg);
+}
+
+.status.shape-capsule {
+  width: 13px;
+  height: 7px;
+  border-radius: 4px;
+}
+
+.status.shape-triangle {
+  width: 10px;
+  height: 9px;
+  border-radius: 0;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.status.shape-star {
+  width: 11px;
+  height: 11px;
+  border-radius: 0;
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+/* agterm's blink: opacity 1 to 0.2 over 0.5 s and back, linear. */
+.status.blink {
+  animation: status-blink 0.5s linear infinite alternate;
+}
+
+@keyframes status-blink {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status.blink {
+    animation: none;
+  }
+}
+
+/* agterm's BadgeView: a red capsule with white bold text, a circle for one digit. */
+.badge {
+  flex: none;
+  box-sizing: border-box;
+  min-width: 16px;
+  height: 16px;
+  margin-left: -2px;
+  padding: 0 4.5px;
+  border-radius: 8px;
+  background: var(--badge-bg, #ff3b30);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+}
+
+.palette-backdrop,
+.switcher-backdrop {
+  /* agterm: the dimming starts under the title bar, and the panel centres over the terminal, beside the sidebar. */
+  --area-height: calc(100vh - var(--chrome-top, 0px));
+  position: fixed;
+  inset: var(--chrome-top, 0px) 0 0 0;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: calc(var(--area-height) * 0.12);
+  background: rgb(0 0 0 / 0.2);
+}
+
+/* agterm's switcher dims the window but takes no clicks. */
+.switcher-backdrop {
+  pointer-events: none;
+}
+
+/*
+ * agterm's InterfaceMetrics: 520 for the palette, 460 for the switcher at the 13px default, scaled by the interface font, shrunk to the terminal area less
+ * 16 each side but not under 280, and never wider than the window; shifted by half the sidebar as far as the window
+ * edge allows; never lower than the window's bottom margin, nor shorter than 160.
+ */
+.palette,
+.switcher {
+  --unit: var(--interface-scale, 1);
+  --panel-width: min(round(calc(var(--ideal-width) * var(--unit)), 1px), max(280px, 100% - var(--sidebar-offset, 0px) - 32px), max(0px, 100% - 32px));
+  position: relative;
+  left: max(0px, min(var(--sidebar-offset, 0px) / 2, (100% - var(--panel-width)) / 2));
+  font-size: var(--interface-font-size, 13px);
+  display: flex;
+  flex-direction: column;
+  width: var(--panel-width);
+  max-height: max(160px, var(--area-height) * 0.88 - 16px);
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--menu-bg) 80%, transparent);
+  backdrop-filter: blur(30px) saturate(1.6);
+  box-shadow: 0 0 24px rgb(0 0 0 / 0.33);
+  overflow: hidden;
+}
+
+.palette {
+  --ideal-width: 520px;
+}
+
+.switcher {
+  --ideal-width: 460px;
+  padding: 6px;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .palette,
+  .switcher {
+    background: var(--menu-bg);
+    backdrop-filter: none;
+  }
+}
+
+.palette-search {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: round(calc(12px * var(--unit)), 1px);
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.palette-search svg {
+  flex: none;
+}
+
+.palette-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font: 1em var(--ui-font);
+}
+
+.palette-list {
+  min-height: 0;
+  max-height: round(calc(320px * var(--unit)), 1px);
+  overflow-y: auto;
+}
+
+.palette-row {
+  --secondary-size: max(8px, round(calc(10px * var(--unit)), 1px));
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: round(calc(6px * var(--unit)), 1px) round(calc(12px * var(--unit)), 1px);
+  cursor: default;
+}
+
+/* agterm: a tint of the system accent over the row, the text keeps its colours. */
+.palette-row.selected {
+  background: color-mix(in srgb, var(--system-accent) 25%, transparent);
+}
+
+.palette-row.disabled .palette-title {
+  color: var(--disabled-text);
+}
+
+/* agterm's hover: a neutral wash apart from the selection, which only the keyboard moves; none on an inert row. */
+.palette-row:not(.selected):not(.disabled):hover {
+  background: color-mix(in srgb, currentColor 4%, transparent);
+}
+
+.palette-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.palette-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.palette-subtitle {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: var(--secondary-size);
+  /* agterm's picker separates its parts with two spaces each side */
+  white-space: pre;
+}
+
+.palette-shortcut {
+  flex: none;
+  color: var(--muted);
+  font: max(8px, round(calc(12px * var(--unit)), 1px)) var(--ui-font);
+}
+
+.palette-badge {
+  flex: none;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--muted) 20%, transparent);
+  color: var(--muted);
+  font: var(--secondary-size) var(--ui-font);
+}
+
+.palette-empty {
+  padding: round(calc(6px * var(--unit)), 1px) round(calc(12px * var(--unit)), 1px);
+  color: var(--muted);
+}
+
+/*
+ * agterm's TerminalSearchBar: a glass and the caption at chromeText 0.7, a plain field at 1, the chevrons and the cross at
+ * 0.8, 8 apart, on the terminal's color with a 0.18 frame, radius 8.
+ */
+.search-bar {
+  position: absolute;
+  top: 8px;
+  right: 16px;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid color-mix(in srgb, var(--text) 18%, transparent);
+  border-radius: 8px;
+  background: var(--terminal-bg);
+  box-shadow: 0 0 8px rgb(0 0 0 / 0.35);
+  color: var(--text);
+}
+
+.search-glass {
+  display: flex;
+  color: color-mix(in srgb, var(--text) 70%, transparent);
+}
+
+.search-input {
+  width: 150px;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: none;
+  color: var(--text);
+  font: 13px var(--ui-font);
+}
+
+.search-counter {
+  color: color-mix(in srgb, var(--text) 70%, transparent);
+  font-size: 11px;
+}
+
+.search-button {
+  display: flex;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: color-mix(in srgb, var(--text) 80%, transparent);
+}
+
+.split-layer {
+  position: absolute;
+  inset: 6px 4px 6px 10px;
+  pointer-events: none;
+}
+
+.split-divider {
+  position: absolute;
+  z-index: 2;
+  pointer-events: auto;
+}
+
+.split-divider::after {
+  content: "";
+  position: absolute;
+  background: var(--border);
+}
+
+.split-divider.vertical {
+  cursor: col-resize;
+}
+
+.split-divider.vertical::after {
+  top: 0;
+  bottom: 0;
+  left: calc(50% - 0.5px);
+  width: 1px;
+}
+
+.split-divider.horizontal {
+  cursor: row-resize;
+}
+
+.split-divider.horizontal::after {
+  left: 0;
+  right: 0;
+  top: calc(50% - 0.5px);
+  height: 1px;
+}
+
+.split-divider:hover::after {
+  background: var(--accent);
+}
+
+.terminal-host.scratch {
+  z-index: 1;
+  background: var(--panel-bg, var(--terminal-bg));
+}
+
+.terminal-host.overlay {
+  z-index: 3;
+  background: var(--panel-bg, var(--terminal-bg));
+}
+
+/* agterm's floating panel: radius 12, a white 0.18 hairline, a 24pt shadow. */
+.terminal-host.overlay.floating {
+  padding: 6px;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.5);
+}
+
+/* agterm's backdropWash: under a floating overlay, the session fades as one layer, each region in its own colour. */
+.backdrop-wash {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  opacity: var(--pane-mute, 0.4);
+  pointer-events: none;
+}
+
+.backdrop-wash-panes {
+  position: absolute;
+  inset: var(--terminal-padding, 6px 8px 6px 8px);
+}
+
+/*
+ * agterm's HUD panel: a terminal in the panel's font on the terminal's background (or --color), the rows painted into
+ * its cell grid; framed, a white 0.30 border at radius 8 and no shadow, frameless the same backing without them.
+ */
+.hud {
+  position: absolute;
+  z-index: 4;
+  overflow: hidden;
+  background: var(--terminal-bg);
+  color: var(--text);
+  font-family: var(--terminal-font-family, "Cascadia Mono", Consolas, monospace);
+  pointer-events: none;
+}
+
+.hud.framed {
+  border: 1px solid rgb(255 255 255 / 0.3);
+  border-radius: 8px;
+}
+
+.hud-grid {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.hud-row {
+  position: absolute;
+  white-space: pre;
+}
+
+.hud-link.armed {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.hud-area {
+  position: absolute;
+  inset: 6px 4px 6px 10px;
+  pointer-events: none;
+}
+
+.hud-pane {
+  position: absolute;
+}
+
+.page-layer {
+  position: absolute;
+  inset: 6px 4px 6px 10px;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.page-overlay {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--panel-bg, var(--terminal-bg));
+  pointer-events: auto;
+}
+
+.terminal-pane::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--terminal-bg);
+  clip-path: var(--holes, none);
+  pointer-events: none;
+}
+
+.page-overlay.holed {
+  background: transparent;
+}
+
+.page-overlay.hidden {
+  visibility: hidden;
+}
+
+.page-overlay.floating {
+  border: 1px solid rgb(255 255 255 / 0.18);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.5);
+}
+
+/*
+ * agterm's page strip: 28 high with a rule at the text's 0.1 under it, the text's 0.06 over the terminal's background,
+ * 10 in from the sides and 10 between its parts, in the terminal's text color at 12.
+ */
+.page-strip {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  height: 29px;
+  padding: 0 10px;
+  border-bottom: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+  background: linear-gradient(color-mix(in srgb, var(--text) 6%, transparent), color-mix(in srgb, var(--text) 6%, transparent)), var(--terminal-bg);
+  color: var(--text);
+  font-size: 12px;
+}
+
+/* agterm's label: the name the app gives the page, cut in the middle, then the page's own title, dimmed, which gives up its width first. */
+.page-label {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.page-name {
+  flex: 0 1 auto;
+  min-width: 3em;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.page-dot {
+  flex: none;
+  color: color-mix(in srgb, var(--text) 40%, transparent);
+}
+
+.page-title {
+  flex: 0 1000 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: color-mix(in srgb, var(--text) 55%, transparent);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.page-actions {
+  display: flex;
+  flex: none;
+  gap: 10px;
+}
+
+/* agterm's HtmlToolbarButton: 22 by 20 at radius 5 in the text's color, 0.55 pressed, 0.3 disabled, a 0.1 wash under the mouse. */
+.page-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: none;
+  color: var(--text);
+}
+
+.page-button:hover:enabled {
+  background: color-mix(in srgb, var(--text) 10%, transparent);
+}
+
+.page-button:active:enabled {
+  background: color-mix(in srgb, var(--text) 22%, transparent);
+  color: color-mix(in srgb, var(--text) 55%, transparent);
+}
+
+.page-button:disabled {
+  color: color-mix(in srgb, var(--text) 30%, transparent);
+}
+
+.page-frame {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  border: 0;
+  background: transparent;
+}
+
+.page-failure {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  text-align: center;
+  user-select: text;
+}
+
+.page-failure-sign {
+  font-size: 24px;
+}
+
+.page-failure-head {
+  font-weight: 600;
+}
+
+.page-failure-error {
+  font-size: 12px;
+}
+
+/* agterm's dashboard: an opaque backdrop in the terminal's color under the cells, the window's translucency dropped. */
+.dashboard-backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--panel-bg);
+}
+
+.terminal-stack.dashboard {
+  inset: 0;
+}
+
+.dashboard-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+}
+
+.dashboard-cell {
+  position: absolute;
+}
+
+/* The frame rides over the cell's contents, as agterm's strokeBorder overlay does. */
+.dashboard-cell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+.dashboard-cell.highlighted::after {
+  border: 1.5px solid var(--text);
+}
+
+/* The caption straddles the bottom frame line, 8 below it and 6 in from the sides. */
+.dashboard-caption {
+  position: absolute;
+  right: 6px;
+  bottom: -8px;
+  left: 6px;
+  z-index: 2;
+  display: flex;
+  justify-content: flex-end;
+  pointer-events: none;
+}
+
+.dashboard-chip {
+  position: relative;
+  isolation: isolate;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: linear-gradient(var(--chip-fill, var(--dashboard-pill)), var(--chip-fill, var(--dashboard-pill))), var(--panel-bg);
+  color: var(--chip-text, var(--row-selected-text));
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.dashboard-chip .dimmed {
+  opacity: 0.55;
+}
+
+.dashboard-chip.blink::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--chip-wash);
+  opacity: 0;
+  animation: chip-wash 0.45s ease-in-out infinite alternate;
+}
+
+@keyframes chip-wash {
+  to {
+    opacity: 0.75;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-chip.blink::before {
+    animation: none;
+  }
+}
+
+.dashboard-cover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.dashboard-cover.overlay {
+  border-radius: 6px;
+  background: var(--panel-bg);
+  color: var(--text);
+  font-size: 12px;
+}
+
+.dashboard-cover-icon svg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 1;
+}
+
+.dashboard-cover-kind {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.dashboard-cover-source {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.dashboard-cover-title {
+  max-width: 100%;
+  overflow: hidden;
+  opacity: 0.55;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--panel-bg);
+  color: var(--text);
+  font-size: var(--interface-font-size, 13px);
+  user-select: text;
+}
+
+.settings-tabs {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 8px 4px 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-tab {
+  padding: 5px 6px;
+  font-size: 0.92em;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+}
+
+.settings-tab:hover {
+  background: var(--row-hover);
+}
+
+.settings-tab.selected {
+  background: var(--row-selected);
+  color: var(--row-selected-text);
+}
+
+.settings-body {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 24px 20px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.settings-body h3 {
+  margin: 18px 0 6px;
+  color: var(--muted);
+  font-size: 0.85em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.settings-hint {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 0.85em;
+}
+
+.settings-control {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  max-width: 62%;
+}
+
+.settings-control .text-button {
+  white-space: nowrap;
+}
+
+.settings-select {
+  max-width: 220px;
+  padding: 3px 6px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--terminal-bg);
+  color: var(--text);
+  font: inherit;
+}
+
+.settings-toggle {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--system-accent);
+}
+
+.settings-inline {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.settings-stepper,
+.settings-slider {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.settings-slider input {
+  width: 160px;
+  accent-color: var(--system-accent);
+}
+
+.settings-value {
+  min-width: 2ch;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.settings-color {
+  width: 36px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: none;
+}
+
+.settings-path {
+  color: var(--muted);
+  font-family: "Cascadia Mono", Consolas, monospace;
+  font-size: 0.85em;
+  word-break: break-all;
+}
+
+.settings-diagnostics {
+  margin: 6px 0;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: var(--terminal-bg);
+  color: var(--danger);
+  font-size: 0.85em;
+  white-space: pre-wrap;
+}
+
+.settings-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.undo-bar {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 8px 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--menu-bg);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.footer-spacer {
+  flex: 1;
+}
+
+.icon-button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+
+.sidebar-caption {
+  padding: 8px 12px 4px;
+  color: var(--muted);
+  font-size: 0.85em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* agterm's hint: centered 40pt below the top, foreground at 0.6. */
+.sidebar-empty {
+  padding: 40px 16px 0;
+  color: color-mix(in srgb, var(--text) 60%, transparent);
+  text-align: center;
+  white-space: pre-line;
+}
+
+/* agterm draws every selected row with the same pill. */
+.session-row.picked {
+  background: var(--sidebar-selected);
+  color: var(--row-selected-text);
+}
+
+.window-inactive .session-row.picked {
+  background: var(--sidebar-selected-inactive);
+}
+
+.session-row.picked .session-icon {
+  color: var(--row-selected-text);
+  opacity: 0.85;
+}
+
+/* xterm.css paints its viewport black; over a backdrop only the theme's translucent background may show. */
+.terminal-host.renderer-translucent .xterm .xterm-viewport,
+.terminal-host.renderer-translucent .xterm .xterm-scrollable-element,
+.translucent .xterm .xterm-viewport,
+.translucent .xterm .xterm-screen,
+.terminal-host.layered .xterm .xterm-viewport,
+.terminal-host.layered .xterm .xterm-screen {
+  background-color: transparent !important;
+}
+
+.translucent .xterm .xterm-viewport,
+.terminal-host.layered .xterm .xterm-viewport {
+  scrollbar-width: none;
+}
+
+/* agshellctl ask */
+
+/* agterm's session ask: its area dimmed by black 0.2 and taking the mouse, so a click there goes to the dialog. */
+.ask-layer {
+  position: absolute;
+  z-index: 7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(0 0 0 / 0.2);
+}
+
+/* agterm's ask overlay: the window takes no clicks while the question is up, only the anchor is dimmed. */
+.ask-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 21;
+}
+
+/* The clipboard prompt and the welcome dialog: a panel in the middle of the dimmed window. */
+.ask-backdrop.centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(0 0 0 / 0.25);
+}
+
+.ask-frame {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(0 0 0 / 0.2);
+}
+
+.ask-anchor {
+  position: absolute;
+  pointer-events: none;
+}
+
+/*
+ * agterm's AskDialogView: a cell is 8 points in the GUI style and the terminal font's 0.6 em (at least 8) in the terminal
+ * one; the panel pads two cells, spaces its parts 1.5 cells apart, takes its own width up to 90 % of the anchor and 72
+ * terminal cells (a field all of that), and stays a cell off the anchor's top and bottom.
+ */
+.ask {
+  --ask-terminal-cell: max(8px, calc(var(--terminal-font-size, 13px) * 0.6));
+  --ask-cell: 8px;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--ask-cell) * 1.5);
+  width: max-content;
+  max-width: min(90%, calc(72 * var(--ask-terminal-cell)));
+  max-height: calc(100% - 2 * var(--ask-cell));
+  padding: calc(var(--ask-cell) * 2);
+  outline: none;
+  overflow: hidden;
+}
+
+.ask.input {
+  width: min(90%, calc(72 * var(--ask-terminal-cell)));
+}
+
+.ask.terminal {
+  --ask-cell: var(--ask-terminal-cell);
+  font-family: var(--terminal-font-family, "Cascadia Mono", Consolas, monospace);
+  font-size: var(--terminal-font-size, 13px);
+  line-height: normal;
+  background: var(--terminal-bg);
+  color: var(--text);
+  border: 1px solid color-mix(in srgb, var(--text) 30%, transparent);
+}
+
+.ask.gui {
+  font-size: var(--interface-font-size, 13px);
+  background: var(--menu-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgb(0 0 0 / 0.5);
+}
+
+/* agterm: the title in the text's size, bold. */
+.ask-title {
+  font-weight: 700;
+}
+
+.ask-message {
+  color: var(--muted);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* agterm: the terminal style's secondary text is the foreground at 70 %. */
+.ask.terminal .ask-message,
+.ask.terminal .ask-choice-subtitle {
+  color: color-mix(in srgb, var(--text) 70%, transparent);
+}
+
+.ask-field,
+.ask-other {
+  width: 100%;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+  color: var(--text);
+  font: inherit;
+  line-height: 1.2;
+  outline: none;
+  resize: none;
+  user-select: text;
+}
+
+/* agterm's terminal editor: a bare field inside half a cell of padding and a square frame at 20% foreground. */
+.ask.terminal .ask-field,
+.ask.terminal .ask-other {
+  padding: 0.5ch;
+  border: 1px solid color-mix(in srgb, var(--text) 20%, transparent);
+  border-radius: 0;
+  background: none;
+}
+
+.ask.gui .ask-field:focus,
+.ask.gui .ask-other:focus {
+  border-color: var(--system-accent);
+}
+
+.ask-choices {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* agterm's row: the marker and the one-line label carry the cursor; the subtitle sits under the label. */
+.ask-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(var(--ask-cell) * 0.2);
+  min-width: 0;
+  cursor: default;
+}
+
+.ask-choice.other {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--ask-cell);
+}
+
+.ask-choice-head,
+.ask-other-mark {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ask-cell);
+  max-width: 100%;
+  padding: calc(var(--ask-cell) * 0.15) calc(var(--ask-cell) * 0.5);
+}
+
+.ask-other-mark {
+  align-items: center;
+}
+
+.ask-other-mark.disabled {
+  opacity: 0.4;
+}
+
+.ask-choice-subtitle {
+  display: flex;
+  gap: var(--ask-cell);
+  padding-left: calc(var(--ask-cell) * 0.5);
+  color: var(--muted);
+  white-space: pre-wrap;
+}
+
+.ask.terminal .ask-choice.cursor .ask-choice-head,
+.ask.terminal .ask-choice.cursor > .ask-other-mark {
+  background: var(--text);
+  color: var(--terminal-bg);
+}
+
+.ask.gui .ask-choice.cursor .ask-choice-head,
+.ask.gui .ask-choice.cursor > .ask-other-mark {
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--system-accent) 25%, transparent);
+}
+
+.ask-mark {
+  flex: none;
+  white-space: pre;
+}
+
+/* agterm's SF Symbols: 16 points wide, the accent when checked, secondary otherwise. */
+svg.ask-mark {
+  width: 16px;
+  height: 16px;
+  align-self: center;
+  color: var(--muted);
+}
+
+svg.ask-mark.checked {
+  color: var(--system-accent);
+}
+
+.ask-choice-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ask-mark-spacer {
+  display: flex;
+  visibility: hidden;
+}
+
+/* The clipboard prompt and the welcome dialog keep their own floor. */
+.ask-backdrop.centered .ask {
+  min-width: min(320px, 90%);
+}
+
+.ask-buttons {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* agterm's AskButtonLayout: every button as wide as the widest, a cell apart, in a row or else a column. */
+.ask-button-group {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 1ch;
+}
+
+.ask-button-group:not(.column) .ask-button {
+  white-space: nowrap;
+}
+
+/* A column caps the shared width at the panel's, so a long label wraps instead of widening it. */
+.ask-button-group.column {
+  grid-auto-flow: row;
+  grid-auto-columns: auto;
+  width: max-content;
+  max-width: 100%;
+}
+
+.clipboard-prompt .ask-buttons,
+.ask.welcome .ask-buttons {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.clipboard-prompt-remember {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.ask-buttons.left {
+  justify-content: flex-start;
+}
+
+.ask-buttons.center {
+  justify-content: center;
+}
+
+.ask-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3px 12px;
+  border: 0;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--text) 16%, transparent);
+  color: var(--text);
+  cursor: default;
+}
+
+.ask-button.active {
+  background: var(--text);
+  color: var(--terminal-bg);
+}
+
+.ask.gui .ask-button {
+  border-radius: 6px;
+}
+
+.ask.gui .ask-button.active {
+  background: var(--system-accent);
+  color: var(--system-accent-text);
+}
+
+/* agterm's terminal button: the foreground at 12 %, square, half a cell across and 0.4 down; a destructive one bold with
+   "! ", in the same colors. */
+.ask.terminal .ask-button {
+  padding: calc(var(--ask-cell) * 0.4) calc(var(--ask-cell) * 0.5);
+  border-radius: 0;
+  background: color-mix(in srgb, var(--text) 12%, transparent);
+  font: inherit;
+}
+
+.ask.terminal .ask-button.active {
+  background: var(--text);
+  color: var(--terminal-bg);
+}
+
+.ask.terminal .ask-button.destructive {
+  font-weight: 700;
+}
+
+/* agterm's .tint(Color.red): systemRed text under .bordered, systemRed with white text under .borderedProminent. */
+.ask.gui .ask-button.destructive {
+  color: var(--system-red);
+}
+
+.ask.gui .ask-button.destructive.active {
+  background: var(--system-red);
+  color: #ffffff;
+}
+
+.ask.welcome {
+  max-width: min(90%, 480px);
+}
+
+.welcome-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ask-button:disabled {
+  opacity: 0.4;
+}
+
+/* agterm's remote rows: the session runs on another machine */
+
+.remote-host {
+  color: var(--muted);
+  font-size: 0.9em;
+}
+
+.remote-host svg {
+  vertical-align: -2px;
+  margin: 0 3px 0 6px;
+}
+
+/* agterm's reconnect note: one line at the foot of a waiting pane, never taking a click */
+
+.remote-note {
+  position: absolute;
+  display: flex;
+  align-items: flex-end;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.remote-note span {
+  width: 100%;
+  padding: 1px 8px;
+  background: #e8c547;
+  color: #000;
+  font-family: var(--terminal-font, monospace);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* agterm's cover: another machine leads the pane, so the program has that machine's size */
+
+.lead-cover {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  background: var(--terminal-bg);
+  color: var(--text);
+  text-align: center;
+  cursor: pointer;
+}
+
+.dashboard-lead-cover {
+  inset: 0;
+}
+
+.lead-cover-title {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.lead-cover-hint {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+/* agterm's two-column element toggles */
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 16px;
+}
+
+.settings-grid-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+/* agterm's shape picker: the glyphs in the status's color */
+
+.shape-picker {
+  position: relative;
+  display: inline-flex;
+}
+
+.shape-picker-button,
+.shape-picker-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 34px;
+  height: 26px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--menu-bg);
+  cursor: pointer;
+}
+
+.shape-picker .status {
+  position: static;
+}
+
+.shape-picker-chevron {
+  color: var(--muted);
+  font-size: 0.8em;
+}
+
+.shape-picker-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--menu-bg);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.35);
+}
+
+.shape-picker-item {
+  border-color: transparent;
+}
+
+.shape-picker-item:hover,
+.shape-picker-item.selected {
+  background: var(--row-hover);
+}
+
+.ghostty-hollow-cursor {
+  position: absolute;
+  box-sizing: border-box;
+  border: 1px solid;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.ghostty-hollow-cursor.blink {
+  animation: ghostty-cursor-blink 1.2s step-end infinite;
+}
+
+@keyframes ghostty-cursor-blink {
+  50% { opacity: 0; }
+}

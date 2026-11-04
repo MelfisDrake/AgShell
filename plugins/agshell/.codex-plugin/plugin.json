@@ -1,0 +1,16 @@
+{
+  "name": "agshell",
+  "description": "Drive AgShell, a Windows terminal for coding agents, through its agshellctl CLI and control pipe.",
+  "author": {
+    "name": "MelfisDrake"
+  },
+  "repository": "https://github.com/MelfisDrake/AgShell",
+  "keywords": ["agshell", "terminal", "windows", "automation"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "AgShell",
+    "shortDescription": "Drive the AgShell Windows terminal from Codex",
+    "developerName": "MelfisDrake",
+    "category": "Productivity"
+  }
+}

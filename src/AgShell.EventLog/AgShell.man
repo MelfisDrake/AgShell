@@ -1,0 +1,82 @@
+<instrumentationManifest xmlns="http://schemas.microsoft.com/win/2004/08/events">
+ <instrumentation xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:win="http://manifests.microsoft.com/win/2004/08/windows/events">
+  <events xmlns="http://schemas.microsoft.com/win/2004/08/events">
+<provider name="AgShell" guid="{8d3f6c1a-52e4-4b7d-9a0e-6c2b1f47d935}" resourceFileName="AgShell.EventLog.dll" messageFileName="AgShell.EventLog.dll" symbol="AgShell">
+ <channels>
+  <channel chid="Operational" name="AgShell/Operational" value="17" type="Operational" enabled="true"/>
+  <channel chid="Debug" name="AgShell/Debug" value="19" type="Debug" enabled="false"/>
+ </channels>
+ <tasks>
+  <task name="Debug" message="$(string.task_Debug)" value="65529"/>
+  <task name="Info" message="$(string.task_Info)" value="65530"/>
+  <task name="Notice" message="$(string.task_Notice)" value="65531"/>
+  <task name="Warning" message="$(string.task_Warning)" value="65532"/>
+  <task name="Error" message="$(string.task_Error)" value="65533"/>
+  <task name="EventSourceMessage" message="$(string.task_EventSourceMessage)" value="65534"/>
+ </tasks>
+ <opcodes>
+ </opcodes>
+ <keywords>
+  <keyword name="Session3" message="$(string.keyword_Session3)" mask="0x100000000000"/>
+  <keyword name="Session2" message="$(string.keyword_Session2)" mask="0x200000000000"/>
+  <keyword name="Session1" message="$(string.keyword_Session1)" mask="0x400000000000"/>
+  <keyword name="Session0" message="$(string.keyword_Session0)" mask="0x800000000000"/>
+ </keywords>
+ <events>
+  <event value="0" version="0" level="win:LogAlways" symbol="EventSourceMessage" task="EventSourceMessage" template="EventSourceMessageArgs"/>
+  <event value="1" version="0" level="win:Error" symbol="Error" message="$(string.event_Error)" task="Error" channel="Operational" template="ErrorArgs"/>
+  <event value="2" version="0" level="win:Warning" symbol="Warning" message="$(string.event_Warning)" task="Warning" channel="Operational" template="WarningArgs"/>
+  <event value="3" version="0" level="win:Informational" symbol="Notice" message="$(string.event_Notice)" task="Notice" channel="Operational" template="NoticeArgs"/>
+  <event value="4" version="0" level="win:Informational" symbol="Info" message="$(string.event_Info)" task="Info" channel="Debug" template="InfoArgs"/>
+  <event value="5" version="0" level="win:Verbose" symbol="Debug" message="$(string.event_Debug)" task="Debug" channel="Debug" template="DebugArgs"/>
+ </events>
+ <templates>
+  <template tid="EventSourceMessageArgs">
+   <data name="message" inType="win:UnicodeString"/>
+  </template>
+  <template tid="ErrorArgs">
+   <data name="category" inType="win:UnicodeString"/>
+   <data name="message" inType="win:UnicodeString"/>
+  </template>
+  <template tid="WarningArgs">
+   <data name="category" inType="win:UnicodeString"/>
+   <data name="message" inType="win:UnicodeString"/>
+  </template>
+  <template tid="NoticeArgs">
+   <data name="category" inType="win:UnicodeString"/>
+   <data name="message" inType="win:UnicodeString"/>
+  </template>
+  <template tid="InfoArgs">
+   <data name="category" inType="win:UnicodeString"/>
+   <data name="message" inType="win:UnicodeString"/>
+  </template>
+  <template tid="DebugArgs">
+   <data name="category" inType="win:UnicodeString"/>
+   <data name="message" inType="win:UnicodeString"/>
+  </template>
+ </templates>
+</provider>
+</events>
+</instrumentation>
+<localization>
+ <resources culture="en-US">
+  <stringTable>
+   <string id="event_Debug" value="[%1] %2"/>
+   <string id="event_Error" value="[%1] %2"/>
+   <string id="event_Info" value="[%1] %2"/>
+   <string id="event_Notice" value="[%1] %2"/>
+   <string id="event_Warning" value="[%1] %2"/>
+   <string id="keyword_Session0" value="Session0"/>
+   <string id="keyword_Session1" value="Session1"/>
+   <string id="keyword_Session2" value="Session2"/>
+   <string id="keyword_Session3" value="Session3"/>
+   <string id="task_Debug" value="Debug"/>
+   <string id="task_Error" value="Error"/>
+   <string id="task_EventSourceMessage" value="EventSourceMessage"/>
+   <string id="task_Info" value="Info"/>
+   <string id="task_Notice" value="Notice"/>
+   <string id="task_Warning" value="Warning"/>
+  </stringTable>
+ </resources>
+</localization>
+</instrumentationManifest>

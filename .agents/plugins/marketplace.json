@@ -1,0 +1,19 @@
+{
+  "name": "agshell",
+  "interface": {
+    "displayName": "AgShell"
+  },
+  "plugins": [
+    {
+      "name": "agshell",
+      "source": {
+        "source": "local",
+        "path": "./plugins/agshell"
+      },
+      "policy": {
+        "installation": "AVAILABLE"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

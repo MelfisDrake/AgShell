@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The AgShell event log provider's message resources (ADR 0011): AgShell.man, the manifest of AgShell.Protocol's
+    LogEventSource, compiled by the Windows SDK's mc.exe and rc.exe into a Win32 resource and carried by an empty assembly.
+    The event log reads the DLL, nothing loads it. agshell.exe registers it with AgShell.man by wevtutil im.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <Target Name="CompileEventManifest" BeforeTargets="CoreCompile" Inputs="AgShell.man" Outputs="$(IntermediateOutputPath)AgShell.res">
+    <ItemGroup>
+      <WindowsSdkMc Include="$(MSBuildProgramFiles32)\Windows Kits\10\bin\10.*\x64\mc.exe" />
+    </ItemGroup>
+    <PropertyGroup>
+      <WindowsSdkBin>%(WindowsSdkMc.RootDir)%(WindowsSdkMc.Directory)</WindowsSdkBin>
+    </PropertyGroup>
+    <Error Condition="'$(WindowsSdkBin)' == ''" Text="The Windows SDK's mc.exe was not found under $(MSBuildProgramFiles32)\Windows Kits\10\bin; install the Windows 10/11 SDK." />
+    <MakeDir Directories="$(IntermediateOutputPath)manifest" />
+    <Exec Command="&quot;$(WindowsSdkBin)mc.exe&quot; -h &quot;$(IntermediateOutputPath)manifest&quot; -r &quot;$(IntermediateOutputPath)manifest&quot; AgShell.man" StandardOutputImportance="low" />
+    <PropertyGroup>
+      <Win32Resource>$(IntermediateOutputPath)AgShell.res</Win32Resource>
+    </PropertyGroup>
+    <Exec Command="&quot;$(WindowsSdkBin)rc.exe&quot; /nologo /fo &quot;$(IntermediateOutputPath)AgShell.res&quot; &quot;$(IntermediateOutputPath)manifest\AgShell.rc&quot;" StandardOutputImportance="low" />
+  </Target>
+
+</Project>

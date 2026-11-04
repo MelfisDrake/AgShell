@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>agshellctl</AssemblyName>
+    <RootNamespace>AgShell.Ctl</RootNamespace>
+    <PublishAot>true</PublishAot>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="2.0.13" />
+    <PackageReference Include="Tomlyn" Version="2.10.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="AgShell.Ctl.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\plugins\agshell\skills\agshell\**\*" LogicalName="skill/%(RecursiveDir)%(Filename)%(Extension)" />
+    <EmbeddedResource Include="AgentStatus\pi-status.ts" LogicalName="pi-status.ts" />
+    <EmbeddedResource Include="AgentStatus\opencode-status.js" LogicalName="opencode-status.js" />
+    <EmbeddedResource Include="AgentStatus\opencode-v2-tui.js" LogicalName="opencode-v2-tui.js" />
+    <EmbeddedResource Include="AgentStatus\agshell-claude-status.sh" LogicalName="agshell-claude-status.sh" />
+    <EmbeddedResource Include="AgentStatus\agshell-agent-status.sh" LogicalName="agshell-agent-status.sh" />
+    <EmbeddedResource Include="AgentStatus\shell\integration.sh" LogicalName="integration.sh" />
+    <EmbeddedResource Include="AgentStatus\shell\integration.fish" LogicalName="integration.fish" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AgShell.Protocol\AgShell.Protocol.csproj" />
+  </ItemGroup>
+
+</Project>
