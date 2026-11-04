@@ -10,7 +10,7 @@ https://github.com/MelfisDrake/AgShell; приватные сообщения о
 
 Этап 0.5.1 — первый публичный бинарный выпуск с MIT/полной атрибуцией и узким
 HTML bridge guard: штатная сборка VT/AOT/installer, runtime provenance и проверка
-конечных ZIP/setup. Самостоятельные hooks сохраняют оба copyright в полном MIT;
+конечных ZIP/setup и включённых Windows SDK projection/WinRT notices. Самостоятельные hooks сохраняют оба copyright в полном MIT;
 skill/plugin включают собственный LICENSE и оригинальный LICENSE-agterm. Notes и процедура выпуска подготовлены в README и release.md.
 Установка и проверка runtime upgrade/регистрации — следующий отдельный этап;
 полная Windows/DPI/IME/accessibility/alpha матрица остаётся открытой.

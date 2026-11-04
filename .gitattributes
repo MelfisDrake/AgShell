@@ -7,3 +7,8 @@
 licenses/dotnet-runtime-MIT.txt -text whitespace=cr-at-eol
 licenses/dotnet-runtime-THIRD-PARTY-NOTICES.txt -text whitespace=cr-at-eol
 licenses/dotnet-windowsdesktop-MIT.txt -text whitespace=cr-at-eol
+
+# Retain the original Microsoft SDK license document.
+licenses/windows-sdk-LICENSE.rtf -text whitespace=-blank-at-eol,cr-at-eol
+licenses/cswinrt-MIT.txt -text whitespace=cr-at-eol
+licenses/windows-sdk-LICENSE.txt whitespace=-blank-at-eol

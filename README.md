@@ -48,7 +48,7 @@ Windows 10, other or mixed DPI, IME, accessibility, text scaling, high contrast,
 Compared with the previously installed 0.5.0:
 
 - Own contributions now use MIT. Full upstream attribution, including the adapted agterm icon, is included in source, ZIP/setup and standalone hook/skill installs.
-- The runtime provenance and original license texts cover the bundled .NET 10.0.14 runtime and direct packages; release publishing pins that runtime version.
+- The runtime provenance and original license texts cover the bundled .NET 10.0.14 runtime, Windows SDK projections/CsWinRT and direct packages; release publishing pins that runtime version.
 - The local HTML bridge checks the message Source, the live overlay registry and the reply destination. Local HTML remains trusted and has command access, including without `--js`; this is defense in depth, with no remote exploit established.
 - Source and downloads use [MelfisDrake/AgShell](https://github.com/MelfisDrake/AgShell); private security reports use [GitHub Security Advisories](https://github.com/MelfisDrake/AgShell/security/advisories/new), as described in SECURITY.md.
 

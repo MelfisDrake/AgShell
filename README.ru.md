@@ -48,7 +48,7 @@ Windows 10, другие и смешанные DPI, IME, accessibility, масш
 Изменения относительно ранее установленной 0.5.0:
 
 - Собственные вклады теперь под MIT. Полная атрибуция upstream, включая адаптированную иконку agterm, включена в исходники, ZIP/setup и отдельные установки хуков/скиллов.
-- Provenance runtime и оригинальные тексты лицензий описывают включённый .NET runtime 10.0.14 и прямые пакеты; release publish закрепляет эту версию runtime.
+- Provenance runtime и оригинальные тексты лицензий описывают включённый .NET runtime 10.0.14, Windows SDK projections/CsWinRT и прямые пакеты; release publish закрепляет эту версию runtime.
 - Мост локального HTML проверяет Source сообщения, registry живого overlay и адрес ответа. Локальный HTML остаётся доверенным и имеет командные полномочия, в том числе без `--js`; это defense in depth, remote exploit не установлен.
 - Исходники и загрузки используют [MelfisDrake/AgShell](https://github.com/MelfisDrake/AgShell); приватные сообщения об уязвимостях — [GitHub Security Advisories](https://github.com/MelfisDrake/AgShell/security/advisories/new), согласно SECURITY.ru.md.
 

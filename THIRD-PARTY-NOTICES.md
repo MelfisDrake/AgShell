@@ -24,6 +24,8 @@ Microsoft.Web.WebView2 1.0.4258.31 contributes the managed control and native lo
 
 CommunityToolkit.WinUI.Notifications 7.1.2 (source `72205c9add7c3fc1ed63bb77e6fc101e39f1ac33`), System.CommandLine 2.0.13 and Tomlyn 2.10.1 are direct redistributed dependencies. Their MIT/BSD notices are retained below, including when their code is part of a single-file or Native AOT executable. This is an addressed check of these runtime and direct package dependencies, not an audit of all build SDK components.
 
+The self-contained application also bundles `Microsoft.Windows.SDK.NET.dll` and `WinRT.Runtime.dll` from Microsoft.Windows.SDK.NET.Ref **10.0.19041.57** (`lib/net8.0`). The projection reports assembly/file versions **10.0.19041.38 / 10.0.19041.55**; WinRT.Runtime reports **2.2.0.0 / 2.2.0.48161**. The package's nuspec declares Copyright Microsoft Corporation and https://aka.ms/WinSDKLicenseURL, with no license file or source commit in the package. The original Microsoft Windows SDK license document and its plain-text rendering are retained below; AgShell's own MIT does not replace these terms. The official [CsWinRT 2.2.0 release](https://github.com/microsoft/CsWinRT/releases/tag/2.2.0.241111.1), source `8649ee3eeb2445ca2a36d80d878ef60b96a6c65d`, identifies the .57 SDK projections; its MIT license for CsWinRT is retained separately.
+
 ## Files
 
 ### `licenses/ghostty.txt`
@@ -217,3 +219,21 @@ SHA-256: `106423785c5b7eba0a8e61d1837f2132e9c828e20ad530f565d981c1df60dd90`
 communitytoolkit.winui.notifications 7.1.2, original NuGet package `License.md`; https://www.nuget.org/packages/communitytoolkit.winui.notifications/7.1.2.
 
 SHA-256: `134aa3b1d2c509dcf57196ccaa7b69db0eb9ae34fa9189c3d683c02d9923175d`
+
+### `licenses/windows-sdk-LICENSE.rtf`
+
+Microsoft.Windows.SDK.NET.Ref 10.0.19041.57 nuspec license URL https://aka.ms/WinSDKLicenseURL, resolved 2026-11-04 to https://download.microsoft.com/download/0/F/F/0FF2B061-47DD-4F55-89B6-FD1D8C44F14D/sdk_license.rtf; original RTF bytes.
+
+SHA-256: `dd07eb178e00c6bba4148457fc00ff77cd4887eb521d504186fe59c9ec8bbe62`
+
+### `licenses/windows-sdk-LICENSE.txt`
+
+Full plain-text rendering of windows-sdk-LICENSE.rtf via Windows RichTextBox.Text, with LF line endings; original RTF retained alongside it.
+
+SHA-256: `5238259f6446dcaa7128b806d9b07fd28320e4b6bf05109704a8356f7449e476`
+
+### `licenses/cswinrt-MIT.txt`
+
+CsWinRT 2.2.0.241111.1, source 8649ee3eeb2445ca2a36d80d878ef60b96a6c65d; https://raw.githubusercontent.com/microsoft/CsWinRT/8649ee3eeb2445ca2a36d80d878ef60b96a6c65d/LICENSE; original bytes.
+
+SHA-256: `9906940f61b1f0b533fa7d99baf55178b2808fbe113ea51dfbfad8572ccd5f2b`

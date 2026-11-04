@@ -29,7 +29,9 @@ reference сохраняет свою версию. SDK и прямые PackageR
 
 Перед сборкой сохранить прежний dist вне репозитория вместе с полным manifest/hashes.
 Проверить root LICENSE, THIRD-PARTY-NOTICES.md и все тексты licenses/ в конечном ZIP,
-а также реальные compiler inputs установщика. Сверить runtime/package versions с manifest
+а также реальные compiler inputs установщика. Manifest 0.5.1 включает 35 license files,
+в том числе Windows SDK projection/WinRT: оригинальные SDK terms, их текстовый вариант
+и CsWinRT MIT; собственная MIT AgShell не заменяет условия этих компонентов. Сверить runtime/package versions с manifest
 и официальными пакетами, source SHA, версии executable, AOT и hashes. Совпадение исходников
 не доказывает идентичность local и GitHub self-contained сборок.
 
