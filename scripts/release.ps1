@@ -49,7 +49,7 @@ Step 'running the tests'
 $diagnostics = Join-Path $root '.build\release-diagnostics'
 Remove-Item -Recurse -Force $diagnostics -ErrorAction SilentlyContinue
 New-Item -ItemType Directory -Path $diagnostics -Force | Out-Null
-& dotnet test (Join-Path $root 'agshell.slnx') -c Release -v normal -nologo `
+& dotnet test (Join-Path $root 'agshell.slnx') -c Release -v normal -nologo "-p:AgShellReleaseRuntimeVersion=$runtimeVersion" `
     --logger 'console;verbosity=detailed' --logger trx --results-directory (Join-Path $diagnostics 'trx') `
     2>&1 | Tee-Object -FilePath (Join-Path $diagnostics 'tests-console.log')
 $testExitCode = $LASTEXITCODE

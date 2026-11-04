@@ -20,7 +20,7 @@ scripts/release.ps1 0.5.1
 
 Последняя команда из чистого source собирает локальные ZIP/setup с VT, Native AOT,
 тестами и Inno Setup, без публикации. Publish закрепляет AgShellReleaseRuntimeVersion=10.0.14
-для приложения, CLI и live: локальный SDK и GitHub SDK могут выбирать разные patch
+для тестового restore, приложения, CLI и live: локальный SDK и GitHub SDK могут выбирать разные patch
 версии по умолчанию, а поставка должна соответствовать проверенным runtime notices.
 Directory.Build.targets адресно задаёт runtime/host/AOT/linker packs .NET 10; Windows SDK
 reference сохраняет свою версию. SDK и прямые PackageReference этим не обновляются. Без Inno локальный скрипт предупреждает
