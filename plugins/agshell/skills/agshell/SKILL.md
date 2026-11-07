@@ -129,6 +129,11 @@ Notes:
   The flag keeps hooks in this tab's process; hook trust still needs review through `/hooks`.
   That running conversation cannot be controlled through the shared server from Codex desktop/mobile.
   Do not stop the shared server: other sessions may depend on it.
+  This is a known limitation, also documented by agterm; AgShell has no automatic conversation-to-pane mapping.
+  In WSL, a stale server `WSL_INTEROP` can also prevent the Windows hook adapter from starting.
+  The workaround preserves the launcher's network proxy and applies to new local interactive launches only.
+  Leave explicit `--remote`, `codex agents`, and server-management commands unchanged.
+  If a conversation remains open in another app, do not force a migration.
 
 ## Recipes
 

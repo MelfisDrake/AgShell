@@ -43,6 +43,8 @@ Version 0.5.1 publishes the first public Windows x64 ZIP and setup alongside sou
 
 Windows 10, other or mixed DPI, IME, accessibility, text scaling, high contrast, multiple monitors, sleep/logoff/reboot and the full graphics/transparency matrix remain unverified. Transparency without blur has known limitations. Earlier upgrade precautions above still apply. Compatible live daemons can preserve shells; incompatible builds require an explicit restart and process survival is not guaranteed.
 
+Known Codex limitation (also documented by agterm): the shared app-server can run status hooks with another tab's environment. AgShell has no automatic Codex conversation-to-pane mapping. In WSL, a stale `WSL_INTEROP` can also prevent the Windows hook adapter from starting. For interactive sessions, use `codex --no-daemon`, or `codex-proxy --no-daemon` if that is your existing launcher. This is a workaround: that conversation cannot be controlled through the shared server from Codex desktop/mobile. The flag does not disable your launcher's network proxy. It affects new launches; keep the existing shared server and its sessions running. See [agent hooks](docs/agshellctl.md#hooks-and-the-skill).
+
 ## 0.5.1 release
 
 Compared with the previously installed 0.5.0:
